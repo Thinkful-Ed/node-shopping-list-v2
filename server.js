@@ -49,6 +49,25 @@ app.post('/shopping-list', jsonParser, (req, res) => {
 });
 
 
+// when new recipe added, ensure has required fields. if not,
+// log error and return 400 status code with hepful message.
+// if okay, add new item, and return it with a status 201.
+app.post('/recipes', jsonParser, (req, res) => {
+  // ensure `name` and `budget` are in request body
+  const requiredFields = ['name', 'ingredients'];
+  for (let i=0; i<requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      const message = `Missing \`${field}\` in request body`
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  }
+  const item = Recipes.create(req.body.name, req.body.ingredients);
+  res.status(201).json(item);
+});
+
+
 app.get('/recipes', (req, res) => {
   res.json(Recipes.get());
 })
