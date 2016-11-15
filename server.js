@@ -1,36 +1,57 @@
+
 const express = require('express');
+const router = express.Router();
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+
+const {ShoppingList, Recipes} = require('./models');
+
+const jsonParser = bodyParser.json();
 const app = express();
 
-const bodyParser = require('body-parser');
-const jsonParser = bodyParser.json();
+// log the http layer
+app.use(morgan('common'));
 
-const {storage} = require('./storage');
-
-// we're going to add some items to storage
+// we're going to add some items to ShoppingList
 // so there's some data to look at
-storage.add('beans', 2.5);
-storage.add('tomatoes', 5);
-storage.add('peppers', 3);
+ShoppingList.create('beans', true);
+ShoppingList.create('tomatoes', false);
+ShoppingList.create('peppers', false);
 
-app.get('/items', (req, res) => {
-  res.json(storage.getItems());
+// adding some recipes to `Recipes` so there's something
+// to retrieve.
+Recipes.create(
+  'boiled white rice', ['1 cup white rice', '2 cups water', 'pinch of salt']);
+Recipes.create(
+  'milkshake', ['2 tbsp cocoa', '2 cups vanilla ice cream', '1 cup milk']);
+
+// when the root of this router is called with GET, return
+// all current ShoppingList items
+app.get('/shopping-list', (req, res) => {
+  res.json(ShoppingList.get());
 });
 
-app.post('/items', jsonParser, (req, res) => {
+app.post('/shopping-list', jsonParser, (req, res) => {
   // ensure `name` and `budget` are in request body
   const requiredFields = ['name', 'budget'];
   for (let i=0; i<requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
-      const message = `Missing \`${field}\` in request body` 
+      const message = `Missing \`${field}\` in request body`
       console.error(message);
       return res.status(400).send(message);
     }
   }
-  
-  const item = storage.add({name: req.body.name, budget: req.body.budget});
+
+  const item = ShoppingList.create(
+    {name: req.body.name, budget: req.body.budget});
   res.status(201).json(item);
 });
+
+
+app.get('/recipes', (req, res) => {
+  res.json(Recipes.get());
+})
 
 app.listen(process.env.PORT || 8080, () => {
   console.log(`Your app is listening on port ${process.env.PORT || 8080}`);
