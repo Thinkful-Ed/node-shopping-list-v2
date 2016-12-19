@@ -17,12 +17,12 @@ function StorageException(message) {
 }
 
 const ShoppingList = {
-  create: function(name, checked) {
+  create: function(name, budget) {
     console.log('Creating new shopping list item');
     const item = {
       name: name,
       id: uuid.v4(),
-      checked: checked
+      budget: budget
     };
     this.items[item.id] = item;
     return item;
