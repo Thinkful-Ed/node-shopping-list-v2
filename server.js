@@ -14,9 +14,9 @@ app.use(morgan('common'));
 
 // we're going to add some items to ShoppingList
 // so there's some data to look at
-ShoppingList.create('beans', true);
-ShoppingList.create('tomatoes', false);
-ShoppingList.create('peppers', false);
+ShoppingList.create('beans', 2);
+ShoppingList.create('tomatoes', 3);
+ShoppingList.create('peppers', 4);
 
 // adding some recipes to `Recipes` so there's something
 // to retrieve.
